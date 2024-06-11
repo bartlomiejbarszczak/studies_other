@@ -1,0 +1,3 @@
+D:/Studies/Semester4/BO1/Lab3_CPP/cmake-build-debug/CMakeFiles/Lab3_CPP.dir
+D:/Studies/Semester4/BO1/Lab3_CPP/cmake-build-debug/CMakeFiles/edit_cache.dir
+D:/Studies/Semester4/BO1/Lab3_CPP/cmake-build-debug/CMakeFiles/rebuild_cache.dir
