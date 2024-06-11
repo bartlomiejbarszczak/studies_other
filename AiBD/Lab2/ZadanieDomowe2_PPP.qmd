@@ -1,0 +1,13 @@
+---
+title: "Przykładowa prezentacja"
+format: pptx
+editor: visual
+---
+
+## Slajd 1
+
+To jest przykładowy tekst. Nie ma większego sensu.
+
+## Slajd 2
+
+![](https://wallpapercave.com/wp/wp9414303.jpg){fig-alt="To jest obrazek"}

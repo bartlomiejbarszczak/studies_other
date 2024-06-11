@@ -1,0 +1,166 @@
+---
+title: "lab10"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+data <- read.csv("beauty.csv", sep = ",")
+```
+
+**tenured** - (float) zatrudnienie profesora
+
+```{r}
+ggplot(data, aes(x = factor(tenured))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Liczba profesorów na etacie",
+       x = "Zatrudnienie",
+       y = "Liczba profesorów") +
+  scale_x_discrete(labels = c("0" = "niezatrudniony", "1" = "zatrudniony")) +
+  theme_minimal()
+```
+
+**profnumber** - (float) indentyfikator profesora
+
+```{r}
+print(paste("Najmniejszy identyfikator: ", min(data$profnumber)))
+print(paste("Największy identyfikator:", max(data$profnumber)))
+```
+
+**minority** - (float) czy profesor nalezy do mniejszosci
+
+```{r}
+ggplot(data, aes(x = factor(minority))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Liczba profesorów z mniejszości",
+       x = "Mniejszość",
+       y = "Ilość") +
+  theme_minimal()
+```
+
+**age** - (float) wiek profesora
+
+```{r}
+print(paste("Najmłodszy: ", min(data$age)))
+print(paste("Najstarszy: ", max(data$age)))
+print(paste("Średni wiek: ", mean(data$age)))
+
+ggplot(data, aes(x = age)) +
+  geom_histogram(binwidth = 1, fill = "#77ff77", color = "#000000") +
+  labs(title = "Rozkład wieku profesorów",
+       x = "Wiek",
+       y = "Ilosc") +
+  theme_minimal()
+```
+
+**beautyf2upper** - (float) ocena 10 do 1, 2. studentka wyższej uczelni
+
+```{r}
+ggplot(data, aes(x = factor(beautyf2upper))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Ilość ocen",
+       x = "beautyf2upper ",
+       y = "Ilosc") +
+  theme_minimal()
+```
+
+**beautyflowerdiv** - (float) ocena 10 do 1, studentka niższej klasy
+
+**beautyfupperdiv** - (float) ocena 10 do 1, studentka wyższej klasy
+
+**beautym2upper** - (float) ocena 10 do 1, 2. student wyższej uczelni
+
+```{r}
+ggplot(data, aes(x = factor(beautym2upper))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Ilość ocen",
+       x = "beautym2upper ",
+       y = "Ilosc") +
+  theme_minimal()
+```
+
+**beautymlowerdiv** - (float) ocena 10 do 1, student niższej klasy
+
+**beautymupperdiv** - (float) ocena 10 do 1, student wyższej klasy
+
+**btystdave** - (float) średnia z 6 standaryzacyjnych ocen piękna
+
+**btystdf2u** - (float) odchylenie standardowe względem ocen drugiej uczennicy wyższej klasy
+
+**btystdfl** - (float) odchylenie standardowe względem ocen pierwszej uczennicy niższej klasy
+
+**btystdfu** - (float) odchylenie standardowe względem ocen pierwszej uczennicy wyższej klasy
+
+**btystdm2u** - (float) odchylenie standardowe względem ocen drugiego ucznia wyższej klasy
+
+**btystdfml** - (float) odchylenie standardowe względem ocen pierwszego ucznia niższej klasy
+
+**btystdmu** - (float) odchylenie standardowe względem ocen pierwszego ucznia wyższej klasy
+
+```{r}
+ggplot(data = data, aes(x = profnumber, y = btystdave, color = age)) +
+  geom_point() +
+  scale_color_gradient(low = "#0000ff", high = "#ff0000") +
+  labs(title = "Odchylenie standardowe ocen z uwzględnieniem wieku",
+       x = "Numer profesora",
+       y = "btystdave",
+       color = "Wiek") +
+  theme_minimal()
+```
+
+**class** - (float) indywidualny kurs w klasach wieloklasowych prowadzony przez profesora
+
+**courseevaluat** - (float) średnia ocen z kursu
+
+**didevaluation** - (float) numer wypełniania ocen
+
+**female** - (float) zmienna określająca płeć profesora
+
+```{r}
+ggplot(data, aes(x = factor(female))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Płeć profesora",
+       x = "Płeć",
+       y = "Ilość") +
+  scale_x_discrete(labels = c("0" = "Mężczyzna", "1" = "Kobieta")) +
+  theme_minimal()
+```
+
+**formal** - (float) zdjęcie: ma na sobie krawat -- marynarkę/bluzkę
+
+**fulldept** - (float) zmienna mówiąca czy profesor posiada swoje zdjęcie w internecie
+
+**lower** - (float) kurs niższej ligi
+
+**multipleclass** - (byte) równe 1, jeśli \>1 profesor jest prowadzący sekcje kursu w próbie
+
+**nonenglish** - (byte) czy profesor mówi biegle po angielsku
+
+```{r}
+ggplot(data, aes(x = factor(nonenglish))) +
+  geom_bar(fill = "#77ff77", color = "#000000") +
+  labs(title = "Ilość profesorów mówiąca biegle w języku angielskim",
+       x = "Potrafi mówić biegle",
+       y = "Ilość") +
+  scale_x_discrete(labels = c("0" = "Tak", "1" = "Nie")) +
+  theme_minimal()
+```
+
+**onecredit** - (byte) równy 1, jeśli kurs ma jeden punkt
+
+**percentevalua\~g** - (float) ewaluacja/studenci
+
+**profevaluation** - (float) procentowa ocena profesora
+
+**students** - (float) ilość studentów w kursie
+
+```{r}
+print(paste("Ilość studentów: ", sum(data$students)))
+```
+
+**tenuretrack** - (float) ścieżka kadencji
+
+**blkandwhite** - (byte) czy osoba czarnoskóra

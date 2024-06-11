@@ -1,0 +1,237 @@
+---
+title: "Zadanie"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(nycflights13)
+
+personal.seed = 19 * 101 
+set.seed(personal.seed)
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+kwartały <- c("Q1", "Q2", "Q3", "Q4")
+
+sales_data <- data.frame(
+  Produkt = rep(produkty, each = length(kwartały)),
+  Q1 = sample(100:500, 12),
+  Q2 = sample(100:500, 12),
+  Q3 = sample(100:500, 12),
+  Q4 = sample(100:500, 12)
+)
+set.seed(personal.seed) 
+produkty <- c("Produkt_A", "Produkt_B", "Produkt_C")
+sklepy <- c("Sklep_X", "Sklep_Y", "Sklep_Z")
+miesiace <- c("Styczeń", "Luty", "Marzec")
+
+sales_data_advanced <- data.frame(
+  Produkt = rep(produkty, each = length(sklepy) * length(miesiace)),
+  Sklep = rep(sklepy, times = length(produkty) * length(miesiace)),
+  Miesiac = rep(miesiace, each = length(produkty) * length(sklepy)),
+  Sprzedaz = sample(100:500, 27),
+  Koszty = sample(30:200, 27),
+  Zysk = NA
+)
+sales_data_advanced$Zysk <- sales_data_advanced$Sprzedaz - sales_data_advanced$Koszty
+```
+
+# Zadanie 1
+
+### 1.
+
+```{r}
+sales_data_long <- 
+  pivot_longer(sales_data, cols = starts_with("Q"), names_to = "Kwartal", values_to = "Sprzedaz")
+
+sales_data_long
+```
+
+### 2.
+
+```{r}
+summarized_table <- 
+  sales_data_long |>
+  group_by(Produkt) |>
+  summarize(Calkowita_Sprzedaz = sum(Sprzedaż))
+
+summarized_table
+```
+
+### 3.
+
+```{r}
+sales_data_wide <- 
+  pivot_wider(sales_data_long, names_from = Kwartal, values_from = Sprzedaz, values_fn = list)
+
+sales_data_wide
+```
+
+# Zadanie 2
+
+### 1.
+
+```{r}
+sales_data_filtered_profit <- 
+  sales_data_advanced |>
+  filter(Zysk > 0)
+
+sales_data_filtered_profit
+```
+
+### 2.
+
+```{r}
+sales_data_sorted <- 
+  sales_data_filtered_profit |>
+  arrange(desc(Zysk), Produkt)
+
+sales_data_sorted
+```
+
+### 3.
+
+marza procentowa wyraza sie wzorem: marza procentowa = (cena sprzedazy - koszt zakupu) / kosz zakupu \* 100%
+
+```{r}
+sales_data_margin <- 
+  sales_data_sorted |>
+  mutate(Marza_procentowa = (Zysk / Koszty) * 100)
+
+sales_data_margin
+```
+
+### 4.
+
+```{r}
+sales_data_store <-
+  sales_data_margin |>
+  group_by(Sklep) |>
+  summarize(Srednia_Sprzedaz = mean(Sprzedaz), Srednie_Koszty = mean(Koszty), Sredni_Zysk = mean(Zysk))
+
+sales_data_store
+```
+
+### 5.
+
+```{r}
+sales_data_pivoted <- 
+  sales_data_margin |>
+  pivot_wider(
+    names_from = Miesiac, 
+    values_from = c(Sprzedaz, Koszty, Zysk))
+
+sales_data_pivoted
+```
+
+### 6.
+
+```{r}
+sales_data_advanced_cost <- 
+  sales_data_margin |>
+  mutate(Koszty_na_Sprzedaz = (Koszty / Sprzedaz) * 100)
+
+sales_data_advanced_cost
+```
+
+### 7.
+
+```{r}
+sales_data_advanced_v2 <- 
+  sales_data_pivoted |>
+  pivot_longer(
+    cols = starts_with("Sprzedaz") | starts_with("Koszty") | starts_with("Zysk"), 
+    names_to = c("Miesiac", "Sprzedaz", "Koszty", "Zysk"), 
+    names_sep = " ", 
+    values_to = "Wartosc")
+
+sales_data_advanced
+sales_data_advanced_v2
+```
+
+### 8.
+
+```{r}
+sales_data_highest_cost <- 
+  sales_data_advanced |>
+  group_by(Produkt) |>
+  slice_max(order_by = (Koszty / Sprzedaz), n = 1)
+
+sales_data_highest_cost
+```
+
+# Zadanie 3
+
+### 1.
+
+```{r}
+max_delay <- 
+  flights |>
+  group_by(carrier) |>
+  summarise(total_delay = sum(arr_delay, na.rm = TRUE)) |>
+  slice_max(order_by = total_delay)
+  
+max_delay
+
+
+mean_delay_destination <- 
+  flights |>
+  group_by(dest) |>
+  summarize(avg_delay = mean(arr_delay, na.rm = TRUE)) |>
+  slice_max(order_by = avg_delay)
+
+mean_delay_destination
+```
+
+### 2.
+
+```{r}
+max_dep_delay_flights <- 
+  flights |>
+  group_by(origin) |>
+  slice_max(order_by = dep_delay, n = 1) |>
+  summarise(dest, flight, tailnum, dep_delay) |>
+  arrange(desc(dep_delay))
+
+max_dep_delay_flights
+```
+
+# Zadanie 4
+
+### 1.
+
+```{r}
+bb_data <- read.csv("billboard.csv")
+bb_data
+```
+
+### 2.
+
+```{r}
+bb_droped_songs <- bb_data |>
+  pivot_longer(
+    cols = starts_with("x"),
+    names_to = "week",
+    values_to = "rank",
+    names_prefix = "x") |>
+  mutate(
+    week = as.numeric(gsub("st.week|nd.week|rd.week|th.week", "", week)),
+    date = as.Date(date.entered) + 7 * (week - 1)) |>
+  filter(date < as.Date("2000-10-01") & date >= as.Date("2000-09-01") & is.na(rank))
+
+bb_droped_songs
+```
+
+### 3.
+
+```{r}
+longest_songs <- 
+  bb_droped_songs |>
+  group_by(artist.inverted, track, genre) |>
+  summarize(duration = max(week, na.rm = TRUE), .groups = "drop") |>
+  group_by(genre) |>
+  top_n(1, duration)
+
+longest_songs
+```

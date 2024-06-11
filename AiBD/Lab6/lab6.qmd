@@ -1,0 +1,126 @@
+---
+title: "Zadanie"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(nycflights13)
+```
+
+## Zadanie 1
+
+1.  year - rok (typ danych to int)
+2.  month - miesiac (typ danych to int)
+3.  day - dzien (typ danych to int)
+4.  dep_time - czas odlotu (typ danych to int)
+5.  sched_dep_time - planowy czas odlotu (typ danych to int)
+6.  dep_delay - opoznienie odlotu (typ danych to double)
+7.   arr_time - czas przylotu (typ danych to int)
+8.  sched_arr_time - planowy czas przylotu (typ danych to int)
+9.  arr_delay - opoznienie przylotu (typ danych to double)
+10. carrier - dwuliterowy skrot (typ danych to chr)
+11. flight - numer lotu (typ danych to int)
+12. tailnum - numer ogonowy samolotu (typ danych to chr)
+13. origin - miejsce wylotu (typ danych to chr)
+14. dest - miejsce przylotu (typ danych to chr)
+15. air_time - czas lotu (typ danych to dbl)
+16. distance - odleglosc (typ danych to dbl)
+17. hour - godzina odlotu (typ danych to dbl)
+18. minute - minuta odlotu (typ danych to dbl)
+19. time_hour - zaplanowana data i godzina lotu jako data POSIXct (typ danych to dttm)
+
+## Zadanie 2
+
+1\.
+
+```{r}
+flights |>
+  filter(dep_delay >= 120) |>
+  glimpse()
+```
+
+2\.
+
+```{r}
+flights |>
+  filter(dest %in% c("IAH", "HOU")) |>
+  glimpse()
+```
+
+3\.
+
+```{r}
+flights |>
+  filter(carrier %in% c("UA", "AA", "DL")) |>
+  glimpse()
+```
+
+4\.
+
+```{r}
+flights |>
+  filter(arr_delay >= 120 & dep_delay == 0) |>
+  glimpse()
+```
+
+5\.
+
+```{r}
+flights |>
+  filter(dep_delay >= 60 & air_time - arr_delay > 30) |>
+  glimpse()
+```
+
+6\.
+
+```{r}
+flights |>
+  arrange(desc(dep_delay)) |>
+  glimpse()
+
+flights |>
+  arrange(dep_time) |>
+  glimpse()
+```
+
+## Zadanie 3
+
+```{r}
+flights |>
+  mutate(speed = distance / air_time * 60) |>
+  arrange(desc(speed)) |>
+  glimpse()
+```
+
+## 
+
+## Zadanie 4
+
+```{r}
+flights |>
+  filter(year == 2013) |>
+  arrange(year, month, day) |>
+  distinct(year, month, day) |>
+  count(year, month, day) |>
+  glimpse()
+```
+
+## Zadanie 5
+
+```{r}
+flights |>
+  arrange(distance) |>
+  slice_tail(n = 10) |>
+  glimpse()
+
+flights |>
+  arrange(distance) |>
+  slice_head(n = 10) |>
+  glimpse()
+```
+
+## Zadanie 6
+
+Tak, ma to znaczenie. Jeżeli najpierw użyjemy filter() a później arrange() to najpierw przefiltrujemy dane a następnie je posortujemy, ma to znaczenie bo i tak zależy nam na posortowanych przefiltrowanych danych więc lepiej będzie najpierw je przefiltrować żeby mieć mniejszy zbiór a następnie posortować ponieważ będzie ich mniej do sortowania.

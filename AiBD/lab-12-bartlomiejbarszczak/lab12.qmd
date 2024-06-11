@@ -1,0 +1,193 @@
+---
+title: "zadanie"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(glmnet)
+library(readxl)
+library(readr)
+library(tidymodels)
+library(rsample)
+library(dplyr)
+library(fastDummies)
+```
+
+# Zadanie 1
+
+## SCORES
+
+```{r}
+data <- read.csv("SCORES.csv")
+
+# Rysowanie wykresu punktowego
+plot1 <- ggplot(data, aes(x = Hours, y = Scores)) +
+  geom_point()+
+  labs(title = "Wykres punktowy", x = "Zmienna Hours", y = "Zmienna Scores") +
+  theme_minimal()
+plot1
+
+# Podział danych na zbiory X i Y
+X <- data$Hours
+Y <- data$Scores
+
+# Podział na zbiór treningowy i testowy
+set.seed(19)
+split <- initial_split(data, prop = 0.7, strata = Scores)
+train_data <- training(split)
+test_data <- testing(split)
+
+# Tworzenie modelu regresji liniowej
+lm_model <- lm(Scores ~ Hours, data = train_data)
+
+# Predykcja dla danych testowych
+y_pred <- predict(lm_model, newdata = test_data)
+
+# Wykres konfrontujący dane testowe i predykcje za pomocą ggplot2
+plot2 <- ggplot() +
+  geom_point(data = test_data, aes(x = Hours, y = Scores), color = "blue") +
+  geom_line(data = data.frame(Hours = test_data$Hours, Scores = y_pred), aes(x = Hours, y = Scores), color = "red") +
+  labs(title = "Porownianie danych testowych i predykcji", x = "Zmienna Hours", y = "Zmienna Scores") +
+  theme_minimal()
+plot2
+
+# Analiza dopasowania modelu
+summary(lm_model)
+
+# Walidacja predykcji
+mae <- mean(abs(test_data$Scores - y_pred))
+mse <- mean((test_data$Scores - y_pred) ^ 2)
+rmse <- sqrt(mse)
+
+cat("Sredni blad bezwzgledny (Mean Absolute Error):", mae, "\n")
+cat("Blad sredniokwadratowy (Mean Squared Error:", mse, "\n")
+cat("Pierwiastek bledu sredniokwadratowego (Root Mean Squared Error):", rmse, "\n")
+```
+
+Wyniki sa calkiem zadowalajace, MAE wynosi prawie 4 co w naszym przypadku gdy dane maja wielkosci z zakresu 20-100 nie jest najgorszym wynikiem
+
+## SBP
+
+```{r}
+data <- read.csv("SBP.csv")
+
+plot1 <- ggplot(data, aes(x = Age, y = SBP)) +
+  geom_point() +
+  labs(title = "Wykres punktowy", x = "Zmienna Age", y = "Zmienna SBP") +
+  theme_minimal()
+plot1
+
+X <- data$Age
+Y <- data$SBP
+
+set.seed(19 * 2)
+split <- initial_split(data, prop = 0.7, strata = SBP)
+train_data = training(split)
+test_data = testing(split)
+
+lm_model = lm(SBP ~ Age, data = train_data)
+
+y_pred = predict(lm_model, newdata = test_data)
+
+plot2 <- ggplot() +
+  geom_point(data = test_data, aes(x = Age, y = SBP), color = "blue") +
+  geom_line(data = data.frame(Age = test_data$Age, SBP = y_pred), aes(x = Age, y = SBP), color = "red") +
+  labs(title = "Porownianie danych testowych i predykcji", x = "Zmienna Age", y = "Zmienna SBP") +
+  theme_minimal()
+plot2
+
+summary(lm_model)
+
+mae <- mean(abs(test_data$SBP - y_pred))
+mse <- mean((test_data$SBP - y_pred) ^ 2)
+rmse <- sqrt(mse)
+  
+cat("Sredni blad bezwzgledny (Mean Absolute Error):", mae, "\n")
+cat("Blad sredniokwadratowy (Mean Squared Error:", mse, "\n")
+cat("Pierwiastek bledu sredniokwadratowego (Root Mean Squared Error):", rmse, "\n")
+```
+
+Wyniki sa lepsze niz w poprzednim przypadku.
+
+# Zadanie 2
+
+## PETROL
+
+```{r}
+data = read.csv("PETROL.csv")
+
+plot1 <- ggplot(data, aes(x = Podatek_paliwowy + Sredni_przychod + Utwardzone_autostrady + Procent_ludnosci_z_prawem_jazdy, y = Zuzycie_paliwa)) +
+  geom_point() +
+  labs(title = "Wykres punktowy", x = "Predyktory", y = "Zmienna Zalezna") +
+  theme_minimal()
+plot1
+
+set.seed(19 * 3)
+split <- initial_split(data, prop = 0.7, strata = Zuzycie_paliwa)
+train_data = training(split)
+test_data = testing(split)
+
+lm_model = lm(Zuzycie_paliwa ~ Podatek_paliwowy + Sredni_przychod + Utwardzone_autostrady + Procent_ludnosci_z_prawem_jazdy, data = train_data)
+y_pred = predict(lm_model, newdata = test_data)
+
+plot2 <- ggplot() +
+  geom_point(data = test_data, aes(x = Podatek_paliwowy + Sredni_przychod + Utwardzone_autostrady + Procent_ludnosci_z_prawem_jazdy, y = Zuzycie_paliwa), color = "blue") +
+  geom_line(data = data.frame(Podatek_paliwowy = test_data$Podatek_paliwowy, Sredni_przychod = test_data$Sredni_przychod, Utwardzone_autostrady = test_data$Utwardzone_autostrady, Procent_ludnosci_z_prawem_jazdy = test_data$Procent_ludnosci_z_prawem_jazdy, Zuzycie_paliwa = y_pred), aes(x = Podatek_paliwowy + Sredni_przychod + Utwardzone_autostrady + Procent_ludnosci_z_prawem_jazdy, y = Zuzycie_paliwa), color = "red") +
+  labs(title = "Porownianie danych testowych i predykcji", x = "Predyktory", y = "Zmienna Zalezna") +
+  theme_minimal()
+plot2
+
+
+summary(lm_model)
+mae <- mean(abs(test_data$Zuzycie_paliwa - y_pred))
+mse <- mean((test_data$Zuzycie_paliwa - y_pred) ^ 2)
+rmse <- sqrt(mse)
+
+cat("Sredni blad bezwzgledny (Mean Absolute Error):", mae, "\n")
+cat("Blad sredniokwadratowy (Mean Squared Error:", mse, "\n")
+cat("Pierwiastek bledu sredniokwadratowego (Root Mean Squared Error):", rmse, "\n")
+```
+
+Wyniki predykcji modelu sa dobre, wplyw na to maja dane do trenowania oraz testowe
+
+# Zadanie 3
+
+## HEART
+
+```{r}
+data = read.csv("HEART.csv")
+data[data == "?"] <- NA
+data <- data |> select(-c("slope", "ca", "thal"))
+data <- na.omit(data)
+
+data <- dummy_cols(data, select_columns = c("cp", "restecg"))
+
+X <- data |> select(-"num")
+y <- data$num
+
+set.seed(19 * 4)
+split <- initial_split(data, prop = 0.8, strata = y)
+train_data <- training(split)
+test_data <- testing(split)
+
+#model <- logistic_reg(mixture = double(1), penalty = double(1)) |>
+#  set_engine("glmnet") |>
+#  set_mode("classification") |>
+#  fit(num ~ ., data = train_data)
+#
+#
+#pred_class <- predict(model,
+#                      new_data = test_data,
+#                      type = "class")
+#
+#pred_proba <- predict(model,
+#                      new_data = test_data,
+#                      type = "prob")
+#
+#results <- test_data |>
+#           select(y) |>
+#           bind_cols(pred_class, pred_proba)
+#
+#accuracy(results, truth = y, estimate = .pred_class)
+```

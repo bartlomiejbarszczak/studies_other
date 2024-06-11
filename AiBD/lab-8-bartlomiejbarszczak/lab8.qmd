@@ -1,0 +1,174 @@
+---
+title: "Zadanie"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+patients <- read_tsv("patient-data-cleaned.txt")
+patients
+```
+
+# Geomy i estetyki
+
+### Wykresy punktowe (scatterplot)
+
+```{r}
+BMIplot <- 
+  ggplot(patients, aes(x = BMI, y = Weight)) +
+  geom_point(aes(color = Height)) +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = FALSE) +
+  scale_colour_gradient2(low = "blue", high = "red", mid = "white", midpoint = 172) +
+  labs(x = "BMI", y = "Waga", title = "Wykres punktowy BMI", color = "Wzrost") +
+  theme(panel.background = element_rect(fill = "lightgray"))
+
+BMIplot
+```
+
+### Wykresy pudełkowe
+
+```{r}
+BMIplot <- ggplot(patients, aes(x = Smokes, y = Score, fill = Sex)) +
+  geom_boxplot() +
+  labs(x = "Typ osoby palacej", y = "Wynik 'Score'", fill = "Płeć", title = "Wykres pudełkowy palaczy i niepalaczy") +
+  scale_fill_manual(values = c("Male" = "lightblue", "Female" = "pink"))
+
+BMIplot
+```
+
+### Histogramy i estymatory jądrowe
+
+```{r}
+# BMIplot <- ggplot(patients, aes(x = BMI)) +
+#   geom_histogram(binwidth = 2 * IQR(patients$BMI) / (length(patients$BMI) ^ (1 / 3)), color = "black", fill='blue') + 
+#   labs(x = "BMI", y = "Liczba pacjentów", title = "Histogram BMI") +
+#   theme(panel.background = element_rect(fill = "#efefef"))
+# 
+# BMIplot
+```
+
+```{r}
+# BMIplot <- ggplot(patients, aes(x = BMI)) +
+#   geom_density(color = "black", fill='blue') + 
+#   labs(x = "BMI", y = "Gęstość", title = "Estymator jądrowy BMI") +
+#   theme(panel.background = element_rect(fill = "#efefef"))
+#   
+# 
+# BMIplot
+```
+
+```{r}
+max.hist.heigth <- max(hist(patients$BMI, plot = FALSE)$counts)
+
+BMIplot <- ggplot(patients, aes(x = BMI)) +
+  geom_histogram(binwidth = 2 * IQR(patients$BMI) / (length(patients$BMI) ^ (1 / 3)), color = "black", fill='blue', alpha = 0.2) +
+  geom_density(mapping = aes(y = after_stat(scaled) * max.hist.heigth), color = "red", fill='transparent') +
+  labs(x = "BMI", y = "Liczba pacjentów / Gęstość", title = "Histogram i Estymator jądrowy BMI") +
+  theme(panel.background = element_rect(fill = "#efefef"))
+
+BMIplot
+```
+
+```{r}
+BMIplot <- ggplot(patients, aes(x = BMI, fill = Sex)) +
+  geom_density(alpha = 0.5) +
+  labs(x = "BMI", y = "Gęstość", title = "Estymator jądrowy BMI")
+
+BMIplot
+```
+
+### Kafelki
+
+```{r}
+BMIplot <- ggplot(patients, aes(x = BMI, y = Weight, color = Height)) +
+  geom_point(alpha = 0.7) +
+  scale_colour_gradient2(low = "black", high = "purple", mid = "#ccaaff", midpoint = (max(patients$Height) + min(patients$Height)) / 2) +
+  labs(x = "BMI", y = "Waga", title = "Wykres punktowy BMI wagi pacjenta") +
+  theme(panel.background = element_rect(fill = "#efefef")) +
+  facet_grid(Sex ~ Smokes)
+
+BMIplot
+```
+
+```{r}
+BMIplot <- ggplot(patients, aes(x = Smokes, y = BMI, fill = Sex)) +
+  geom_boxplot() +
+  labs(x = "Typ osoby palacej", y = "BMI", title = "Wykres pudełkowy palaczy i niepalaczy") +
+  theme(panel.background = element_rect(fill = "#efefef")) +
+  facet_grid(Age ~ .)
+
+BMIplot
+```
+
+```{r}
+patients$Age <- as.factor(patients$Age)
+
+BMIplot <- ggplot(patients, aes(x = Sex, y = BMI, fill = Age)) +
+  geom_boxplot() +
+  labs(x = "Płeć", y = "BMI", title = "Wykres pudełkowy palaczy i niepalaczy", fill = "Wiek") +
+  theme(panel.background = element_rect(fill = "#efefef")) +
+  facet_grid(. ~ Smokes)
+
+BMIplot
+```
+
+# Skale i tematy
+
+### Skale
+
+```{r}
+BMIplot <- 
+  ggplot(patients, aes(x = BMI, y = Weight)) +
+  geom_point(aes(color = Height)) +
+  scale_colour_gradient2(low = "blue", high = "red", mid = "white", midpoint = (max(patients$Height) + min(patients$Height)) / 2) +
+  labs(title = "Wykres punktowy BMI", color = "Wzrost") +
+  theme(panel.background = element_rect(fill = "lightgray")) +
+  scale_x_continuous(breaks = c(20, 30, 40), limits = c(20, 40), name = "BMI") +
+  scale_y_continuous(breaks = seq(60, 100, by = 5), limits = c(60, 100), name = "Waga (kg)")
+
+BMIplot
+```
+
+```{r}
+BMIplot <- 
+  ggplot(patients, aes(x = BMI, y = Weight)) +
+  geom_point(aes(color = Height)) +
+  scale_colour_gradient2(low = "#006B38", high = "#B10723", mid = "grey", midpoint = mean(patients$Height)) +
+  labs(x = "BMI", y = "Waga", title = "Wykres punktowy BMI", color = "Wzrost")
+
+BMIplot
+```
+
+### Motywy
+
+```{r}
+BMIplot <- ggplot(patients, aes(x = BMI, y = Weight, color = Height)) +
+  geom_point() +
+  geom_smooth(aes(group = Height), method = "lm", formula = 'y ~ x', se = FALSE) +
+  labs(x = "BMI", y = "Waga", title = "Wykres punktowy BMI") +
+  theme(panel.background = element_rect(fill = "white")) +
+  theme(legend.key = element_rect(fill = "white")) +
+  theme(legend.position = "bottom") +
+  theme(axis.line = element_line(linewidth = 0.2)) +
+  theme(axis.ticks = element_line(linewidth = 0.2)) +
+  theme(axis.title = element_text(size = 10)) +
+  theme(axis.text = element_text(size = 8)) +
+  theme(legend.text = element_text(size = 8)) +
+  theme(legend.title = element_blank()) +
+  theme(panel.grid = element_blank()) +
+  theme(panel.grid.minor = element_blank()) +
+  theme(legend.background = element_rect(fill = "white")) +
+  theme(legend.box.background = element_rect(fill = "white")) +
+  theme(legend.box.margin = margin(0, 0, 0, 0)) +
+  theme(legend.margin = margin(0, 0, 0, 0)) +
+  theme(legend.key.size = unit(0.5, "cm")) +
+  theme(plot.title = element_text(size = 12)) +
+  theme(plot.margin = margin(1, 1, 1, 1))
+
+
+BMIplot
+ggsave("BMIplot.png", plot = BMIplot, width = 16, height = 16, units = "cm")
+```

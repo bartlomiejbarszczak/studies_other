@@ -1,0 +1,198 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Modele Liniowe
+
+## Bilioteki używane w laboratorium
+
+-   glmnet
+-   readxl
+-   readr
+-   tidymodels
+
+## Regresja liniowa
+
+Regresja liniowa to tworzenie modeli przedstawiających wielkość, której wartość chcemy przewidzieć (zmienna zależna) jako kombinację liniową predyktorów (zmiennych zależnych).
+
+Struktura modelu ma postać
+
+$$\tilde{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 +\ldots+ \beta_n x_n$$
+
+lub w formie macierzowej
+
+$$\tilde{\mathbf{y}} = \mathbf{[1\  X ]} \beta$$
+
+gdzie wektor wartości zmiennych zależnych jest przewidywany na podstawie macierzy danych i wektora współczynników $\beta$.
+
+Współczynnik $\beta_0$ w nomentkalturze anglojęzycznej jest nazywany *intercept* ponieważ jest to punkt przecięcia się z osią $y$ gdy wszystkie predyktory są równe 0.
+
+Aby wyznaczyć parametry modelu liniowego potrzebujemy wektora danych uczących, tj. znanych nam wartości zmiennej zależnej $\mathbf{y}$ oraz odpowiadająxcej mu macierzy predyktorów $\mathbf{X}$. Macierz predyktorów nosi nazwę *design matrix*.
+
+Model regresyjny ma mocne umocowanie statystyczne, jednak w ramach zajęć będziemy traktować go machinistycznie jak jedną z metod uczenia maszynowego. Do tworzenia takich modeli służy polecenie *lm*.
+
+#### Przykład prostej regresji liniowej zależności wzrostu od wieku:
+
+Wczytywanie danych i ich wizualizacja:
+
+```{r, echo=TRUE}
+library(tidymodels)
+library(readxl)
+ageandheight <- read_excel("ageandheight.xls", sheet = "Hoja2") #Upload the data
+ggplot(ageandheight, aes(x = age, y = height )) +
+  geom_point()
+```
+Obliczenie modelu regresji liniowej dla danych:
+```{r}
+lmHeight = lm(height~age, data = ageandheight) #Create the linear regression
+summary(lmHeight) #Review the results
+```
+Dla dokładnej wizualizacji wyników modelu można użyć pakietu ``ggplot```:
+```{r}
+ggplot(ageandheight, aes(x = age, y = height)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+```
+W przypadku chęci użycia regresji liniowe zależności wzrostu od wielu zmiennych możemy użyć następującej składni:
+```{r}
+lmHeight2 = lm(height~age + no_siblings, data = ageandheight) #Create a linear regression with two variables
+print(summary(lmHeight2)) #Review the results
+```
+
+Użycie ``ggplot`` do tworzenia regresji liniowej wielu zmiennych:
+```{r}
+ggplot(ageandheight, aes(x = age + no_siblings, y = height)) + 
+  geom_point() +
+  stat_smooth(method = "lm")
+```
+Obydwa przykłady zostały zaczerpnięte z [Linear Regression in R Tutorial](https://www.datacamp.com/tutorial/linear-regression-R)
+
+### Dane uczące i dane testowe
+
+Zazwyczaj rozwiązując problem nie mamy dostępu do dodatkowych danych testowych uzupełniających nasze dane uczące. Dlatego też, popularną praktyką jest podzielenie posiadanego zbioru danych w sposób losowy na dwa zbiory: uczący i testowy.
+
+## Zadanie 1
+
+Na podstawie danych zawartych w pliku SCORES.csv wykonaj i oceń regresję liniową, gdzie Twoją daną niezależną (predyktorem) będą godziny poświęcone na przygotowanie, a wynikową uzyskane punkty. Wykonanie zadania powinno składać się z następujących kroków:
+
+1.  Odczytaj dane z pliku SCORES.csv. Przeprowadź wstępną analizę danych.
+2.  Wykonaj wstępny wykres uzyskanych danych (typu "scatter")
+3.  Dokonaj podziału danych na zbiory danych niezależnych (wejściowe, X) oraz zaleznych (wyjściowe, y) dla swojego modelu, a następnie podziel zbiór na dane testowe i treningowe (30%)
+4.  Utwróz model regresji liniowej za pomocą *lm*
+5.  Przenalizuj opis dopasowania modelu zwracany przez funkcję *lm*
+6.  Wykorzystając stworozny model dokonaj predykcji dla części testowej X. Porównaj wynik (y_pred) z posiadanymi danymi (y_test).
+7.  Wykonaj wykres konfrontujący dane testowe (X_test, y_test; typu "scatter") oraz predykcje (X_test, y_pred; linia prosta)
+8.  Dokonaj walidacji uzyskanych predykcji wykorzystując metryki: średni błąd bezwzględny (Mean Absolute Error), błąd średniokwadratowy (Mean Squared Error) oraz pierwiastek błędu średniokwadratowego (Root Mean Squared Error).
+
+Następnie utworzony skrypt wykorzystaj na danych zawartych w SBP.csv, gdzie predyktorem będzie wiek, a wynikiem ciśnienie (SBP). Czy uzyskane wyniki z modelu są równie zadowalające?
+
+## Zadanie 2
+
+Na podstawie danych zawartych w pliku PETROL.csv wykonaj i oceń regresję liniową. Jako daną zależną wykorzystaj zużycie paliwa, a pozostałe - jako predyktory. Wykonanie zadania powinno składać się z kroków podobnych do tych z zadania poprzedniego.
+
+Czy uzyskane wyniki predykcji modelu są dobre? Co mogło mieć pozytywny/negatywny wpływ na taki wynik?
+
+## Regresja logistyczna
+
+Naturalnym rozwojem modeli linowych, są uogólnione modele liniowe (*generalized linear models*).
+
+Ich przewodnią ideą jest to, że zamiast reprezentować zmienną zależną jako kombinację liniową niezależnych, staramy się stworzyć model liniowy pewnej funkcji zmiennej zależnej.
+
+$$ f(y) =  \beta_0 + \beta_1 x_1 + \beta_2 x_2 +\ldots+ \beta_n x_n$$
+
+wymaga się, aby funkcja ta była odwracalna, dzięki czemu
+
+$$ y = f^{-1} ( \beta_0 + \beta_1 x_1 + \beta_2 x_2 +\ldots+ \beta_n x_n)$$
+
+Takie przekształcenie stosujemy wtedy, gdy zbiór wartości zmiennej zależnej nie jest całym zbiorem liczb rzeczywistych tylko jest w jakiś sposób ograniczony. Na przykład do przedziału $[0,1]$, do wartości dodatnich lub wartości całkowitych. W tens posób można wybrać funkcję $f$, której dziedziną jest zbiór wartości $y$ zaś obrazem jest zbiór liczb rzeczywistych.
+
+Jedną z takich funkcji jest tzw. funkcja logistyczna, która odpowiada zbiorowi $[0,1]$ przez co często jest wykorzystywana do analizy prawdopodobieństwa przynależności do danej klasy, lub też inaczej jako klasyfikator.
+
+W takiej sytuacji zmienne zależne powinny przyjmować wyłącznie wartości $0$ i $1$ co odpowiada temu czy dany punkt należy do interesującej klasy. Model logistyczny poznwala na określenie estymaty prawdopodobieństwa, czy punkt należy czy nie do danej klasy.
+
+Do tworzenia modeli logistycznyc służy biblioteka `tidymodels` i metoda `logistic_reg`.
+
+#### Przykład użycia regresji logistycznej w określeniu czy klient kupi subskrypcję produktu w kampani maketingowej
+
+Wczytanie i wstępna analiza danych:
+
+```{r}
+library(readr)
+library(tidymodels)
+
+# Read the dataset and convert the target variable to a factor
+bank_df <- read_csv2("bank-full.csv")
+bank_df$y = as.factor(bank_df$y)
+
+# Plot job occupation against the target variable
+ggplot(bank_df, aes(job, fill = y)) +
+    geom_bar() +
+    coord_flip()
+```
+
+Za pomocą funkcji `initial_split` możemy podzielić dane na zbiory testowe i treningowe
+
+```{r}
+# Split data into train and test
+set.seed(421)
+split <- initial_split(bank_df, prop = 0.8, strata = y)
+train <- split %>% 
+         training()
+test <- split %>% 
+        testing()
+```
+
+Uczenie modelu regresji logistycznej odbywa się w następujący sposób:
+
+```{r}
+# Train a logistic regression model
+model <- logistic_reg(mixture = double(1), penalty = double(1)) %>%
+  set_engine("glmnet") %>%
+  set_mode("classification") %>%
+  fit(y ~ ., data = train)
+
+# Model summary
+tidy(model)
+```
+
+Na podstawie modelu możemy przeprowadzić predykcję dla wybranych klientów:
+
+```{r}
+# Class Predictions
+pred_class <- predict(model,
+                      new_data = test,
+                      type = "class")
+
+# Class Probabilities
+pred_proba <- predict(model,
+                      new_data = test,
+                      type = "prob")
+
+results <- test %>%
+           select(y) %>%
+           bind_cols(pred_class, pred_proba)
+
+accuracy(results, truth = y, estimate = .pred_class)
+
+```
+
+Powyższy przykład został zaczerpnięty z [Logistic Regression in R Tutorial](https://www.datacamp.com/tutorial/logistic-regression-R)
+
+## Zadanie 3
+
+Na podstawie danych zawartych w pliku HEART.csv wykonaj i oceń regresję logistyczną, gdzie Twoją daną zależną jest kolumna "num". Wykonanie zadania powinno składać się z następujących kroków:
+
+1.  Zaimportowanie niezbędnych bibliotek w szczególności tych tworzących modele liniowe, a także biblioteki do operacji na danych oraz tworzenia wykresów.
+2.  Odczytanie danych z pliku HEART.csv. Przeprowadź wstępną analizę danych.
+3.  Przetworzenie danych, tj: oznaczenie braku danych ("?") na NaN, usunięcię kolumn zawierających zbyt dużo brakujących danych (3 kolumny), usunięcie wierszy z brakującymi wartościami.
+4.  Zakoduj niezależne zmienne kategorialne np: jako wartości "dummy". Zmienne kategorialne to takie, które reprezentuja przynależność do kategorii. W przypadku naszych odfiltrowanych danych będą to kolumny: cp, restecg, fbs, sex, exang. Jako, że trzy ostatnie już zapisane są w formie 0 i 1 tylko cp i restecg wymagają tej operacji.
+5.  Dokonaj podziału danych na zbiory danych niezależnych (wejściowe, X) oraz zależnych (wyjściowe, y) dla swojego modelu, a następnie podziel zbiór na dane testowe i treningowe (20%).
+6.  Utwróz model regresji logistycznej.
+7.  Oceń wynik za pomocą wybranych metryk.
+
+Możesz również spróbować ustandaryzować dane (np: poprzez skalowanie) po podziale na zbiory treningowy i testowy.
+
+
+
+

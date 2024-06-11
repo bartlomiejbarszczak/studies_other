@@ -1,0 +1,16 @@
+---
+title: "DataFrame z ćwiczeń"
+format: html
+editor: visual
+code-fold: true
+---
+
+```{r}
+#| echo: false
+subjects <- c("Analiza i Bazy Danych", "Metody Numeryczne", "Eksploracja danych")
+means <- c(71, 67, 89)
+classes <- rep(2022, times = 3)
+df <- data.frame(Przedmiot = subjects, Srednia = means, Rocznik = classes)
+
+df
+```

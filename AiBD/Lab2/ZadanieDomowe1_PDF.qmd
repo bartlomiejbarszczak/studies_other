@@ -1,0 +1,17 @@
+---
+title: "Gęstość prawdopodobieństwa funkcji Gaussa"
+format: pdf
+editor: visual
+---
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+$$
+
+Gdzie:
+
+(µ) to wartość oczekiwana
+
+(𝛔) to odchylenie standardowe.
+
+(ℼ) to stała matematyczna (w przybliżeniu 3.14159).

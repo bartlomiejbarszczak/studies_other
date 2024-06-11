@@ -1,0 +1,128 @@
+---
+title: "Zadanie"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+data <- read.csv("beauty.csv", sep = ",")
+```
+
+# Zadanie 1
+
+```{r}
+any(is.na(data))
+any(sapply(data, function(x) any(is.infinite(x))))
+```
+
+Dane wygladaja na poprawne. Nie ma wartosci NaN oraz wartosci INF
+
+# Zadanie 2
+
+```{r}
+plot21 <- ggplot(data, aes(x = as.array(courseevaluation), y = as.array(profevaluation), color = factor(female))) +
+  geom_point() +
+  geom_smooth(method = 'lm', formula = 'y ~ x', se = FALSE) + 
+  labs(title = "Zwiazek miedzy ocena nauczyciela a ocena kursu",
+       x = "Ocena Kursu",
+       y = "Ocena Nauczyciela",
+       color = "Plec") +
+  scale_color_discrete(labels = c("1" = "Kobieta", "0" = "Mezczyzna")) +
+  theme_minimal()
+
+connection21 <- data |>
+  summarise(
+    correlation = cor(profevaluation, courseevaluation),
+    meanprofevaluation = mean(profevaluation),
+    meancourseevaluation = mean(courseevaluation)
+  )
+
+connection21
+plot21
+
+```
+
+```{r}
+connection22 <- data |>
+  group_by(female, tenured, minority) |>
+  summarise(
+    correlation = cor(profevaluation, courseevaluation),
+    meanprofevaluation = mean(profevaluation),
+    meancourseevaluation = mean(courseevaluation)
+  )
+
+connection22
+```
+
+Maja miedzy soba jakis zwiazek i to dosc silny. Charakter tego zwiazku jest podobny dla roznych plci, doswiadczenia czy mniejszosci.
+
+# Zadanie 3
+
+```{r}
+
+```
+
+# Zadanie 4
+
+```{r}
+newdata = data |>
+  mutate(meanbeauty2upper = (beautyf2upper + beautym2upper) / 2)
+
+connection41 <- lm(meanbeauty2upper ~ age, data = newdata)
+summary(connection41)
+
+
+plot41 <- ggplot(newdata, aes(x = as.array(age), y = as.array(meanbeauty2upper))) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = FALSE) +
+  labs(title = "Zwiazek miedzy wiekiem nauczyciela a ocena urody",
+       x = "Wiek Nauczyciela",
+       y = "Ocena Urody"
+  )
+
+plot41
+```
+
+Tak, im jest starszy tym jest gorzej oceniany, sa od tego wyjatki jak np ocena 8.5 w wieku 58 lat\
+
+# Zadanie 5
+
+```{r}
+plot51 <- ggplot(data, aes(x = as.array(age), y = as.array(courseevaluation))) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = FALSE) +
+  labs(title = "Zwiazek miedzy wiekiem nauczyciela a ocena kursu",
+       x = "Wiek Nauczyciela",
+       y = "Ocena Kursu"
+  )
+
+plot52 <- ggplot(data, aes(x = as.array(age), y = as.array(profevaluation))) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = 'y ~ x', se = FALSE) +
+  labs(title = "Zwiazek miedzy wiekiem nauczyciela a ocena nauczyciela",
+       x = "Wiek Nauczyciela",
+       y = "Ocena Nauczyciela"
+  )
+
+plot51
+plot52
+```
+
+Tak, im nauczyciel jest starszy tym gorsza jego ocena i ocena kursu
+
+# Zadanie 6
+
+```{r}
+connection61 <- newdata |>
+  summarise(
+    correlation = cor(meanbeauty2upper, courseevaluation),
+    meanbeauty = mean(meanbeauty2upper),
+    meancourseevaluation = mean(courseevaluation)
+  )
+connection61
+```
+
+Jest slaby zwiazek pomiedzy uroda nauczyciela a ocena kursu
