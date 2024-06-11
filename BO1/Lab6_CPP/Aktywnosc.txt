@@ -1,0 +1,54 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+#include <vector>
+#include <map>
+#include <limits>
+
+int INF = std::numeric_limits<int>::max();
+
+struct my_graph {
+  std::map<int, std::vector<int>> adjlist;
+  std::map<std::pair<int, int>, int> wages;
+};
+
+
+// todo dodac funckje do zmiany na adjlist
+
+
+
+
+
+int main()
+{   
+    std::vector<std::vector<int>> g1 = {
+        {INF, 3, 3, 5, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF},
+        {INF, 3, INF, 4, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF},
+        {INF, INF, INF, INF, INF, 5, INF, INF, 5, INF, INF, INF, INF, INF, INF, INF, INF},
+        {INF, INF, 4, INF, 3, INF, INF, 9, 6, INF, INF, INF, INF, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 8, INF, INF, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, 4, 6, 6, INF, INF, INF, INF, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, INF, 2, INF, INF, INF, 13, 7, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, 2, INF, INF, 7, INF, INF, INF, INF},
+        {INF, INF, INF, INF, INF, INF, 7, INF, INF, 7, 3, INF, INF, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 11, 3, 6, INF, INF, INF, INF}, 
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 13, INF, 9, 7, 6, INF} ,
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 9}, 
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 8, INF, INF, INF, INF, INF} ,
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF} ,
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 2, INF, 3, INF} ,
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, 7} ,
+        {INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF, INF} ,
+            
+    };
+    
+    
+    
+    return 0;
+}
